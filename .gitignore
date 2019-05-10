@@ -1,8 +1,12 @@
 /.gitignore
 /.idea
+/.vscode
 /application/config
 /weibo
 /MemTest.php
 /test.php
 /callback.php
 /PrivateInfo
+/uploads/*
+/application/cache/*
+/application/logs/*

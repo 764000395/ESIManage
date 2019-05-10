@@ -10,8 +10,6 @@ class Article extends  MY_Controller{
     public function __construct()
     {
         parent::__construct();
-
-
     }
     //加载文章认领页面，
     public  function article_claim()
@@ -49,9 +47,12 @@ class Article extends  MY_Controller{
     }
 
     //文章认领动作，
-    public function claim()
+     public function claim()
     {
-
+		if(strlen($this->session->userdata('job_number')) != 8){
+			reset_msg('非法操作');
+			return;
+		}
         $this->load->model('article_model','art');
 
         if($this->uri->segment(3)!=null)
@@ -174,7 +175,8 @@ class Article extends  MY_Controller{
          $data=$this->deal_claim_time($this->art->select_article_id($id),s_year());
          $this->load->view('admin/article_info.html',$data);
      }
-     //取消认领 改
+	 
+   //取消认领 改
     public function remove_article()
     {
         $this->load->model('article_model','art');
@@ -184,7 +186,6 @@ class Article extends  MY_Controller{
             reset_msg('非法操作');
             return;
         }
-
 
         $data=array(
             'owner'=>null,
@@ -205,8 +206,8 @@ class Article extends  MY_Controller{
             $data['waitSecond']=3;
             $this->load->view('admin/tips.html',$data);
         }
-
     }
+	
     public function deal_claim_time($article,$update_time)//处理history字段
     {
         $up_time=0;
@@ -231,9 +232,5 @@ class Article extends  MY_Controller{
 
         $data['article']=$article;
         return $data;
-    }
-
-    public function test(){
-        echo 'test';
     }
 }

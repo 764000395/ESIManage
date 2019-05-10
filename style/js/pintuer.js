@@ -499,5 +499,13 @@ $(function(){
 		});
 
 	});
+	$('.loading').click(function () {
+		console.log("1");
+        layer.open({
+            type: 2,
+            content: 'Loading...',
+            shadeClose:false
+        });
+    });
 
 })

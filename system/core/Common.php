@@ -890,8 +890,12 @@ function msg_alert($msg)
 		</script>";
     exit;
 }
-
+//返回超级管理员的用户
+function root_array(){
+	$root = array('10130004','16101210','17101211');
+	return $root;
+}
 //当前统计年份
 function s_year(){
-    return 2017;
+    return 2018;
 }

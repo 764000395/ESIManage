@@ -6,7 +6,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<meta name="renderer" content="webkit">
-		<title>后台管理中心</title>
+		<title>学科建设信息管理系统——河南大学</title>
 		<link rel="icon" href="/style/images/henu.ico" type="image/x-icon">
 		<link rel="stylesheet" href="/style/css/pintuer.css">
 		<link rel="stylesheet" href="/style/css/admin.css">
@@ -51,8 +51,8 @@
 
 
 			</ul>
-			<h2><span class="icon-bar-chart-o"></span>ESI论文统计</h2>
-			<ul>
+			<h2 class="on"><span class="icon-bar-chart-o"></span>ESI论文统计</h2>
+			<ul style="display:block">
 				<li>
 					<a href="<?php echo site_url().'article/article_claim'?>" target="right"><span class="icon-caret-right"></span>ESI论文认领</a>
 				</li>
@@ -62,8 +62,8 @@
 
 			</ul>
 			<!--nature-->
-			<h2><span class="icon-list-alt"></span>Nature Index<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;论文统计</h2>
-			<ul>
+			<h2 class="on"><span class="icon-list-alt"></span>Nature Index<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;论文统计</h2>
+			<ul style="display:block">
 				<li>
 					<a href="<?=site_url('nature/add_nature')?>" target="right"><span class="icon-caret-right"></span>添加Nature Index论文</a>
 				</li>
@@ -88,15 +88,15 @@
 		</script>
 		<ul class="bread">
 			<li>
-				<a href="#" target="right" class="icon-home"> 首页</a>
+				<a href="http://xkc.henu.edu.cn/" target="_blank" class="icon-home"> 首页</a>
 			</li>
 			<li>
 				<a href="##" id="a_leader_txt">网站信息</a>
 			</li>
 			<li><b>当前语言：</b><span style="color:red;">中文</php></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;切换语言：
 				<a href="##">中文</a> &nbsp;&nbsp;
-				<a href="javascript:layer.open({content:'英文系统尚未开放',skin: 'msg',time: 3 })">英文</a>
-
+				<a href="javascript:layer.open({content:'英文系统尚未开放',skin: 'msg',time: 3 });void(0);">英文</a>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;技术支持：<a href="http://www.107lab.com" target="_blank">107网站工作室</a>
 			</li>
 		</ul>
 		<div class="admin">
@@ -115,7 +115,7 @@
 						'<div class="body-content">' +
                         '           <div class="form-group">\n' +
                         '                <div class="label">\n' +
-                        '                    <label>请设置您的姓名全拼，<span class="text-red" style="font-size: 20px">注意：姓和名字之间要加空格！</span><br>例如：您的名字是<span class="text-red" style="font-size: 18px">杨志颖</span>，请输入<span class="text-red" style="font-size: 18px">yang zhiying</span></label>\n' +
+                        '                    <label>请设置您的姓名全拼，<span class="text-red" style="font-size: 20px">注意：姓和名字之间要加空格！</span><br>例如：您的名字是<span class="text-red" style="font-size: 18px">张学友</span>，请输入<span class="text-red" style="font-size: 18px">zhang xueyou</span></label>\n' +
                         '                </div>\n' +
                         '                <div class="field">\n' +
                         '                    <input type="text" class="input w80" value="" name="full_spell" placeholder="请输入您的姓名全拼" data-validate="required:请输姓名全拼" required>\n' +

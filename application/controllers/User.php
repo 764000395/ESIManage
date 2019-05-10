@@ -73,7 +73,7 @@ class User extends MY_Controller{
 
     //设置英文名
     public function set_full_spell(){
-        $full_spell = $this->input->post('full_spell');
+        $full_spell = trim($this->input->post('full_spell'));
         if($this->um->set_full_spell($full_spell, array('job_number'=>$this->session->userdata('job_number')))){
             $this->session->set_userdata('full_spell', $full_spell);
             $data['msg']="设置成功";

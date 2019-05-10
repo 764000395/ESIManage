@@ -6,7 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Date: 2018/10/13
  * Time: 13:50
  */
-class Format extends CI_Controller{
+class Format extends MY_Controller{
 
     public  function  replace()
     {

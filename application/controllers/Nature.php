@@ -86,6 +86,15 @@ class Nature extends MY_Controller{
             $data['jumpUrl'] = site_url('nature/my_nature');
             $this->load->view('admin/tips.html', $data);
         }else{
+			if($this->session->userdata('identity') == 1){ //管理员操作，查看录入人信息 
+				$this->load->model('user_model', 'user');
+				$owner_num = $nature[0]['owner']; //录入人的工号
+				$owner = $this->user->get_user_info(array('job_number' => $owner_num));
+				if(empty($owner)){
+					msg_alert('非法操作！');
+				}
+				$data['owner'] = $owner[0]; 
+			}
             $data['nature'] = $nature[0];
             $this->load->view('nature/info.html', $data);
         }

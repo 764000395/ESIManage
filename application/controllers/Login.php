@@ -26,6 +26,7 @@ class Login extends  CI_Controller
         if($code != $this->session->userdata('code')){
             error_alert('验证码错误');
         }
+
         $job_number = $this->input->post('name');
         $password = $this->input->post('password');
         $login_status = false;
@@ -36,11 +37,16 @@ class Login extends  CI_Controller
 
 
         if($login_status){ //登录成功
-            $token = time().mt_rand(0, 9999);
-            $mem = new Memcached();
-            $mem->addServer('127.0.0.1', '11211');
-            $mem->set('token'.$user[0]['job_number'], $token);
-            $this->session->set_userdata(array('name'=>$user[0]['name'], 'job_number'=>$user[0]['job_number'], 'identity'=>$user[0]['identity'],'academy'=>$user[0]['academy'], 'full_spell'=>$user[0]['full_spell'], 'token'.$user[0]['job_number']=>$token));
+            $this->session->set_userdata(array('name'=>$user[0]['name'], 'job_number'=>$user[0]['job_number'], 'identity'=>$user[0]['identity'],'academy'=>$user[0]['academy'], 'full_spell'=>$user[0]['full_spell']));
+            if($user[0]['identity'] < 1){
+                $right = 'user';
+            }else{
+                $right = 'admin';
+                if(in_array($user[0]['job_number'],root_array())){
+                    $right = 'root';
+                }
+            }
+            $this->session->set_userdata(array('right'=>$right));
             $data['msg'] = '登陆成功';
             $data['jumpUrl']= site_url();
         }else{
@@ -72,29 +78,14 @@ class Login extends  CI_Controller
         $this->load->library('code',$config);
         $this->code->show();
     }
-
-    public function other_login(){
-        $data['jumpUrl'] = site_url('login');
-        $data['failure'] = TRUE;
-        $data['msg'] = '您的账号在别处登录!<br>如非本人操作，请立即修改密码！';
-        $data['waitSecond']=5;
-        $this->session->sess_destroy();
-        $this->load->view('admin/tips.html',$data);
-    }
-
-    public function tips(){
-        $data['jumpUrl'] = site_url('login');
-        $data['failure'] = TRUE;
-        $data['msg'] = '您的账号在别处登录!<br>如非本人操作，请立即修改密码！';
-        $data['waitSecond']=999999;
-        $this->load->view('admin/tips.html',$data);
-    }
-
-    public function ended(){
+	
+	//认领截止 提示普通用户已结束认领
+	public function ended(){
         $data['jumpUrl'] = 'http://xkc.henu.edu.cn';
         $data['failure'] = TRUE;
         $data['msg'] = '对不起，认领工作已结束<br>系统处于关闭状态暂不能登录。';
         $data['waitSecond']=666;
         $this->load->view('admin/tips.html',$data);
     }
+	
 }

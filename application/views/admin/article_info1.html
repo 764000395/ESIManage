@@ -15,7 +15,7 @@
 <div class="panel admin-panel">
   <div class="panel-head"><strong><span class="icon-pencil-square-o"></span> 论文信息</strong></div>
   <div class="body-content">
-    <form method="post" class="form-x" action="">
+    <div class="form-x" action="#">
       <div class="form-group">
         <div class="label">
           <label>论文题目：</label>
@@ -125,7 +125,7 @@
           <label>认领人：</label>
         </div>
         <div class="field">
-          <input readonly  type="text" class="input" name="s_email" value="<?=isset($article[1]['name'])? $article[1]['name']:''  ?>" />
+          <input readonly  type="text" class="input" name="s_name" value="<?=isset($article[1]['name'])? $article[1]['name']:''  ?>" />
         </div>
       </div>
       <div class="form-group">
@@ -133,7 +133,7 @@
           <label>认领人单位/学院：</label>
         </div>
         <div class="field">
-          <input readonly  type="text" class="input" name="s_email" value="<?=isset($article[1]['academy'])? $article[1]['academy']:''  ?>" />
+          <input readonly  type="text" class="input" name="s_academy" value="<?=isset($article[1]['academy'])? $article[1]['academy']:''  ?>" />
         </div>
       </div>
       <div class="form-group">
@@ -141,23 +141,71 @@
           <label>认领时间：</label>
         </div>
         <div class="field">
-          <input readonly  type="text" class="input" name="s_email" value="<?=isset($article[0]['claim_time'])? date('Y-m-d H:i:s',$article[0]['claim_time']) :''  ?>" />
+          <input readonly  type="text" class="input" name="s_claim_time" value="<?=isset($article[0]['claim_time'])? date('Y-m-d H:i:s',$article[0]['claim_time']) :''  ?>" />
         </div>
       </div>
-
+	  
+	  <?php if(!isset($article[1]['name'])):?>
+	  <form id="assign_form" method="post" action="/manage/ESI_assign">
+	  <div class="form-group">
+        <div class="label">
+          <label>文章指派：</label>
+        </div>
+        <div class="field">
+		  <input type="hidden" name="accession_number" value="<?=$article[0]['accession_number']?>">
+          <input type="text" class="input w50" name="assign_owner" value="" placeholder="请输入被指派人工号" required/> &nbsp;&nbsp;
+		  <button class="button bg-green icon-paper-plane" id="assign_submit"> 指派</button>
+		  <div class="tips assign_tips"></div>
+        </div>
+      </div>
+	  <?php endif; ?>
+	  
       <div class="form-group">
         <div class="label">
           <label></label>
         </div>
         <div class="field">
-          <a href="javascript:history.back(-1)" class="button bg-main icon-check-square-o" type="button" > 返回</a>
+          <a href="javascript:history.back(-1)" class="button bg-main icon-times" type="button" > 返回</a>
+		  
           <a class="button border-main" href="<?php echo site_url().'manage/reset_claim/'.$article[0]['accession_number']?>" onclick="return rset()" ><span class="icon-edit"></span> 重置</a>
 
         </div>
       </div>
-    </form>
+    </div>
+	
+	
+	
   </div>
 </div>
+<script src="/style/js/jquery.js"></script>
+<script src="/style/js/pintuer.js"></script>
+<script type="text/javascript">
+	
+	$('input[name="assign_owner"]').on('input', function(e){
+		
+		var val = $.trim($(this).val());
+		//console.log(val);
+		if(val.length == 8){
+			$.get('/manage/get_user_json/'+val, function(data){
+				var html = data.msg;
+				if(data.code == 200){
+					html = '教师工号：' + data.data.job_number + '，教师姓名：' + data.data.name + '，教师所在单位：' + data.data.academy;
+				}
+				$('.assign_tips').html(html);
+			}, 'json');
+		}else{
+			$('#mydialog .tips').html('');
+		}
+	});
+	$('#assign_form').submit(function(e){
+		var owner = $.trim($('input[name="assign_owner"]').val());
+		if(owner.length != 8){
+			e.preventDefault();
+			alert('您输入的工号不正确！');
+			return;
+		}
+	});
+</script>
 <script type="text/javascript">
     var msg1="您确定要重置吗？";
     function rset() {
@@ -168,4 +216,6 @@
         }
     }
 </script>
-</body></html>
+</body>
+
+</html>

@@ -55,7 +55,7 @@
                     <label for="academy"><span class="text-dot">*</span>院系/单位：</label>
                 </div>
                 <div class="field">
-                    <input type="text" class="input w50" id="academy" name="academy" size="50" placeholder="请输入所在院系/单位" data-validate="required:院系/单位不能为空"/>
+                    <input type="text" class="input w50 <?=$this->session->userdata('right')=='admin'?'academy_deined':'';?>"  <?php if($this->session->userdata('right')=='admin') echo "readonly"; ?> id="academy" name="academy" size="50" placeholder="请输入所在院系/单位" value="<?=$this->session->userdata('right')=='admin'?$this->session->userdata('academy'):''; ?>" data-validate="required:院系/单位不能为空"/>
                 </div>
             </div>
             <div class="form-group">
@@ -118,6 +118,11 @@
     </div>
 </div>
 </body></html>
+<style type="text/css">
+.academy_deined{
+   cursor:not-allowed;
+}
+</style>
 <script>
 
 </script>

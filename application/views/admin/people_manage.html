@@ -10,28 +10,58 @@
 <link rel="stylesheet" href="/style/css/admin.css">
 <script src="/style/js/jquery.js"></script>
 <script src="/style/js/pintuer.js"></script>
+<style type="text/css">
+  .academy{
+      width:100%;
+      /* border: 2px solid #00AAEE; */
+      display: none;
+  }
+  .academy>ol>li{
+      width: 170px;
+      float: left;
+      margin: 0 10px; 
+      line-height: 25px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+  }
+</style>
 </head>
 <body>
 <div class="panel admin-panel">
   <div class="panel-head"><strong class="icon-reorder"> 内容列表</strong></div>
   <div class="padding border-bottom">
     <a href="<?php echo base_url().'manage/add_teacher' ?>" class="button border-yellow"><span class="icon-plus-square-o"> 添加用户</span></a>
+    <?php if($this->session->userdata('right') == 'root') {?>
+    <a href="<?php echo base_url().'upload_file/user_add_view' ?>" class="button border-red"><span class="icon-plus-square-o"> 导入用户</span></a>
+    <?php }?>
   </div>
   <form method="post" action="<?php echo site_url().'manage/select_teacher' ?>" id="serchform">
     <div class="padding border-bottom">
       <ul class="search" style="padding-left:10px;">
         <li>搜索方式：
-          <select name="select_mothod" class="input"  style="width:120px; line-height:17px; display:inline-block">
+          <select name="select_mothod" class="input" id="search_way"  onclick="select_academy()" style="width:120px; line-height:17px; display:inline-block">
             <option value="0">教师工号</option>
             <option value="1">教师姓名</option>
+            <?php if($this->session->userdata('right') == 'root') {?>
+            <option value="2">学院单位</option>
+            <?php }?>
           </select>
         </li>
         <li>
-          <input type='text' placeholder='请输入搜索关键字' name='keywords' class='input' style='width:250px; line-height:17px;display:inline-block' value="<?php echo set_value('keywords') ?>"/>
+          <input type='text' placeholder='请输入搜索关键字' name='keywords' id="search_input" class='input' style='width:250px; line-height:17px;display:inline-block' value="<?php echo set_value('keywords') ?>"/>
           <input type="submit" value="搜索" class="button border-main icon-search"/>
-        <li/>
+        </li>
       </ul>
     </div>
+    <div class="academy">
+      <ol>
+      <?php foreach($academy as $k => $v):?>
+          <li><input type="checkbox" name="check_academy[]" value="<?php echo $v['academy'];?>" id="<?php echo 'academy'.$k;?>"><label for="<?php echo 'academy'.$k;?>"><?php echo $v['academy'];?></label></li>
+      <?php endforeach;?>
+  </ol>
+  </div>
   </form>
   <table class="table table-hover text-center">
     <tr>
@@ -42,9 +72,9 @@
     </tr>
    <?php foreach($user as $v): ?>
     <tr>
-      <td><?php echo $v['job_number'] ?></td>
-      <td><?php echo $v['name'] ?></td>
-      <td><?php echo $v['academy'] ?></td>
+      <td <?php if( $v['identity'] == '1') echo 'style="color:red;"'; ?> ><?php echo $v['job_number'] ?></td>
+      <td <?php if( $v['identity'] == '1') echo 'style="color:red;"'; ?> ><?php echo $v['name'] ?></td>
+      <td <?php if( $v['identity'] == '1') echo 'style="color:red;"'; ?> ><?php echo $v['academy'] ?></td>
       <td><div class="button-group">
 
         <a class="button border-green" href="<?php echo site_url().'manage/fill_info/'.$v['job_number'] ?>" ><span class="icon-edit"></span> 编辑</a>
@@ -74,5 +104,20 @@ function rset() {
         return false;
     }
 }
+
+//控制多学院选择
+function select_academy(){
+  var search_way = $('#search_way').val();
+      if($(".academy").is(':hidden') && search_way == 2){
+        $(".academy").slideDown('slow');
+        $('#search_input').css({'cursor':'not-allowed'});
+        $('#search_input').attr('readonly',true);
+      }else if(!$(".academy").is(':hidden') && search_way != 2){
+          $(".academy").slideUp('slow');
+          $('#search_input').css({'cursor':'default'});
+          $('#search_input').attr('readonly',false);
+      }
+  }
+
 </script>
 </body></html>

@@ -14,7 +14,7 @@
 <div class="panel admin-panel">
     <div class="panel-head" id="add"><strong><span class="icon-pencil-square-o"></span>上传文件</strong></div>
     <div class="body-content">
-        <form id="upload_form" method="post"  class="form-x" action="<?php echo site_url().'upload_file/upload_excle' ?>" enctype="multipart/form-data" >
+        <form id="upload_form" method="post"  class="form-x" action="<?php echo $url ?>" enctype="multipart/form-data" >
             <div class="form-group">
                 <div class="label">
                     <label>文件：</label>
@@ -29,6 +29,7 @@
                 </div>
                 <div class="field">
                     <button class="button bg-main icon-check-square-o" type="submit" onclick="wait()" > 导入</button>
+                    <!-- <input type="submit" class="button bg-main icon-check-square-o" /> -->
                 </div>
             </div>
         </form>

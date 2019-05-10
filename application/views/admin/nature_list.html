@@ -50,15 +50,17 @@
         </div>
 
 
+    <form action="<?=site_url('manage/nature_delete_mutilate')?>" method="post">
 
     <table class="table table-hover text-center">
         <tr>
-            <th>第一作者</th>
+            <th width="50">选择</th>
+            <th width="120">第一作者</th>
             <th>通讯作者</th>
             <th>第一单位</th>
             <th>文章题目</th>
             <th>发表期刊</th>
-            <th>发表时间</th>
+            <th width="100">发表时间</th>
             <th>卷</th>
             <th>期</th>
             <th>页</th>
@@ -67,25 +69,28 @@
         </tr>
         <?php foreach($nature as $n):?>
         <tr>
-            <td class="long_td">
+            <td>
+                <input type="checkbox" name="checkbox_nature[]" value="<?php echo $n['id'];?>" id="">
+            </td>
+            <td>
                 <?php echo $n['first_author'] ?>
             </td>
-            <td class="long_td">
+            <td>
                 <?php echo $n['corresponding_author'] ?>
             </td>
-            <td class="long_td">
+            <td>
                 <?php echo $n['first_unit'] ?>
             </td>
-            <td class="long_td">
+            <td>
                 <a style="color: #0ae;text-decoration: underline;" href="<?=site_url('nature/nature_info/'.$n['id'])?>" title="<?php echo $n['title'] ?>"><?php echo $n['title'] ?></a>
             </td>
-            <td class="long_td">
+            <td>
                 <?php echo $n['periodical'] ?>
             </td>
-            <td class="long_td">
+            <td>
                 <?php echo date('Y-m-d', $n['publish_time'])?>
             </td>
-            <td class="long_td">
+            <td>
                 <?php echo $n['roll'] ?>
             </td>
             <td>
@@ -112,11 +117,18 @@
         </tr>
         <?php endforeach ?>
         <tr>
+            <td colspan="15" style="text-align:left; padding:19px 0;padding-left:20px;">
+                <input type="checkbox" id="checkall" style="float: left; margin-top: 10px;" /><span style="float:left;margin-top:10px;">全选</span>&nbsp;&nbsp;&nbsp;
+                <input type="submit"  value="删除" class="button border-red " style="padding:5px 15px; float:left; margin:5px;" />
+            </td>
+        </tr>
+        <tr>
             <td colspan="14" align="center">
                 <div class="pagelist"><?php if(isset($links)){echo $links;}?></div>
             </td>
         </tr>
     </table>
+    </form>
 </div>
 <form  action="" method="get" name="hidden_from" id="hidden_from">
       <input type="hidden" value="<?=isset($status)?$status:''?>" name="status">
@@ -150,6 +162,17 @@
 
     }
 
+    //全选
+    $("#checkall").click(function(){ 
+        $("input[name='checkbox_nature[]']").each(function(){
+            if (this.checked) {
+                this.checked = false;
+            }
+            else {
+                this.checked = true;
+            }
+        });
+    })
     //nature index 删除
     function nature_delete(id){
         if(confirm("确定要删除吗？")){

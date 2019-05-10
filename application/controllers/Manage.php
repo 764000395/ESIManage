@@ -13,6 +13,16 @@ class Manage extends MY_Controller{
         if($this->session->userdata('identity') < 1){
             msg_alert('该操作不被允许');
         }
+        //所有关于用户的操作，放进这个数组的方法是允许二级管理员操作的
+        $user_operating = array('index','add_teacher','add','select_teacher','del_teacher','reset_pwd','fill_info','fill');
+        $operating = $this->uri->segment(2);  //获取当前要执行的操作
+
+        
+        if (!in_array($operating,$user_operating)) {
+            if($this->session->userdata('job_number') != 10130004 && $this->session->userdata('job_number') != 16101210 && $this->session->userdata('job_number') != 17101211){
+                msg_alert('操作非法');
+            }
+        }
 
     }
 
@@ -24,7 +34,12 @@ class Manage extends MY_Controller{
         $per_page=20;
         //查询数据库
         $data['user']= $this->um->get_user_list(array(),$offset,$per_page,null);
+        if($this->session->userdata('right') != 'root'){
+            $this->db->where(array('academy'=>$this->session->userdata('academy')));
+        }
         $data['count']=$this->db->count_all_results('user');
+        //获取所有学院单位的名称 ----为了添加按照学院查询教师
+        $data['academy'] = $this->um->get_user_academy();
         //设置分页
         $this->load->library('pagination');
         $this->load->helper('paging');
@@ -90,6 +105,7 @@ class Manage extends MY_Controller{
 
         $column_name0='job_number';
         $column_name1='name';
+        $column_name2='academy';
 
         if($select==0)
         {
@@ -97,8 +113,13 @@ class Manage extends MY_Controller{
         }else if($select==1)
         {
             $data=$this->um->search_teacher( $column_name1,$key);
+        }else if($select==2){
+            $key = $this->input->get_post('check_academy');
+            $data = $this->um->search_teacher_byacademy($column_name2,$key);
         }
         $data['links']= null;
+        //获取所有学院单位的名称 ----为了添加按照学院查询教师
+        $data['academy'] = $this->um->get_user_academy();
         $this->load->view('admin/people_manage.html',$data);
     }
     //删除教师
@@ -212,7 +233,7 @@ class Manage extends MY_Controller{
         $type=$this->input->get('select_mothod');
         $key=trim($this->input->get('keywords'));
 
-        $column_arr=array('author_del','title','subject','owner','academy');
+        $column_arr=array('author_del','title','subject','owner','academy','accession_number');
 
        if($column_arr[$type]===null)//检测查询条件是否错误
        {
@@ -270,9 +291,9 @@ class Manage extends MY_Controller{
     //删除文章
     public function del_article()
     {
-        $this->load->model('User_model','um');
+        $this->load->model('Article_model','am');
         $id=$this->uri->segment(3);
-        $aff_rows=$this->um->del_article($id);
+        $aff_rows=$this->am->del_article($id);
         if($aff_rows==1)
         {
             $data['msg']="删除成功";
@@ -291,7 +312,7 @@ class Manage extends MY_Controller{
     //重置文章认领者
     public function reset_claim()
     {
-        $this->load->model('User_model','um');
+        $this->load->model('Article_model','am');
         $id=$this->uri->segment(3);
         $data_arr=array(
             'owner'=>null,
@@ -300,7 +321,7 @@ class Manage extends MY_Controller{
         $where_arr=array(
             'accession_number'=>$id
         );
-        $aff_rows=$this->um->reset_claim($data_arr,$where_arr);
+        $aff_rows=$this->am->reset_claim($data_arr,$where_arr);
         if($aff_rows==1)
         {
             reset_msg("重置成功");
@@ -347,6 +368,101 @@ class Manage extends MY_Controller{
         }
         $this->load->view('admin/article_info1.html',$data);
     }
+	
+	//文章指派 根据工号指派文章
+	public function ESI_assign(){
+		$owner = $this->input->post('assign_owner'); //被指派着工号（认领人）
+		$accession_number = $this->input->post('accession_number'); //论文入藏号
+		//判断工号是否符合规范 必须位数字且为8位 判断入藏号是否符合规范 WOS:数字
+		if(!is_numeric($owner) || strlen($owner) != 8 || !preg_match('/^WOS:\d+$/i', $accession_number)){
+			msg_alert('请输入正确的工号或入藏号！');
+		}
+		$this->load->model('article_model', 'article');
+		$is_claim = $this->article->get_article_info(array('accession_number' => $accession_number));
+		if(empty($is_claim)){ //检查要指派的文章是否存在
+			msg_alert('该论文不存在！');
+		}
+		if(!empty($is_claim[0]['owner'])){ //检查要指派的文章是否已经被认领
+			msg_alert('该文章已被认领，请重置后再指派！');
+		}
+		$status = $this->db->update('thesis', array('owner' => $owner, 'claim_time' => time()), array('accession_number' => $accession_number));
+		if($status){
+			msg_alert('指派成功！');
+		}else{
+			msg_alert('指派失败！');
+		}
+    }
+    
+       //文章批量指派 根据工号一次指派多篇文章
+       public function ESI_assign_multiple(){
+        $owner = $this->input->post('assign_owner'); //被指派着工号（认领人）
+        if(empty($owner)){
+            msg_alert("工号不能为空，请填写工号！");
+        }
+
+        $accession_number_array = $this->input->post('checkbox'); //论文入藏号
+        if(empty($accession_number_array)){
+            msg_alert("未选择要指派的文章，请选择要指派的文章！");
+        }
+        foreach($accession_number_array as $accession_number){
+            // //判断工号是否符合规范 必须位数字且为8位 判断入藏号是否符合规范 WOS:数字
+            if(!is_numeric($owner) || strlen($owner) != 8 || !preg_match('/^WOS:\d+$/i', $accession_number)){
+                msg_alert('请输入正确的工号或入藏号！');
+            }
+            $this->load->model('article_model', 'article');
+            $is_claim = $this->article->get_article_info(array('accession_number' => $accession_number));
+            if(empty($is_claim)){ //检查要指派的文章是否存在
+                msg_alert('该论文不存在！');
+            }
+            if(!empty($is_claim[0]['owner'])){ //检查要指派的文章是否已经被认领
+                msg_alert('存在已被认领的文章，请检查重置后再指派！');
+            }
+        }
+        $access_all = 0;
+        $access_success = 0;
+        $access_fail = 0;
+        foreach($accession_number_array as $accession_number){
+		    $status = $this->db->update('thesis', array('owner' => $owner, 'claim_time' => time()), array('accession_number' => $accession_number));
+            $access_all++;
+            if($status){
+                $access_success++;
+            }else{
+                $access_fail++;
+            }
+        }
+        $msg = "共指派".$access_all."篇文章，成功".$access_success."篇，失败".$access_fail."篇！";
+        msg_alert($msg);
+        // if($status){
+		// 	msg_alert('指派成功！');
+		// }else{
+		// 	msg_alert('指派失败！');
+		// }
+    }
+	
+	
+	//人员信息
+	public function get_user_json($owner){
+		$this->load->model('user_model', 'user'); //载入user_model
+		$data = $this->user->get_user_info(array('job_number' => $owner)); //获取教师信息
+		if(empty($data)){
+			$return_data = array(
+				'code' => 400,
+				'msg' => '未找到该教师信息！请检查工号是否正确！',
+			);
+		}else{
+			$array = array(
+				'job_number' => $data[0]['job_number'],
+				'name' => $data[0]['name'],
+				'academy' => $data[0]['academy'],
+			);
+			$return_data = array(
+				'code' => 200,
+				'msg' => '获取成功',
+				'data' => $array,
+			);
+		}
+		echo json_encode($return_data, JSON_UNESCAPED_UNICODE);
+	}
 
     /* Nature相关 */
     //nature列表
@@ -418,6 +534,36 @@ class Manage extends MY_Controller{
             $data['msg'] = '删除失败';
             $data['failure'] = true;
         }
+        $this->load->view('admin/tips.html',$data);
+    }
+    //nature批量删除
+    public function nature_delete_mutilate(){
+        $nature_array = $this->input->post('checkbox_nature');
+        $all = 0;
+        $success = 0;
+        $fail = 0;
+        foreach($nature_array as $id)
+        {
+            $all++;
+            if($this->db->delete('nature', array('id'=>$id))){
+                $success++;
+            }else{
+                $fail++;
+            }
+        }
+        $show = "总共删除".$all."篇，成功".$success."篇，失败".$fail."篇！";
+        $data['msg'] = $show;
+        // msg_alert($show);
+        $data['jumpUrl']= site_url('manage/nature_list');
+        $data['waitSecond']=8;
+
+
+        // if($this->db->delete('nature', array('id'=>$id))){
+        //     $data['msg']="删除成功！";
+        // }else{
+        //     $data['msg'] = '删除失败';
+        //     $data['failure'] = true;
+        // }
         $this->load->view('admin/tips.html',$data);
     }
     //nature index 论文管理导出表格

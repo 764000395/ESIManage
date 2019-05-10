@@ -31,7 +31,7 @@
                     <label>审核状态：</label>
                 </div>
                 <div class="field">
-                    <input type="text" class="input" name="status" value="<?php if($nature['status'] == 0){echo '审核中';}elseif($nature['status'] == 1){echo '通过审核';}else{'未通过审核';}?>" readonly/>
+                    <input type="text" class="input" name="status" value="<?php if($nature['status'] == 0){echo '审核中';}elseif($nature['status'] == 1){echo '通过审核';}else{echo '未通过审核';}?>" readonly/>
                 </div>
             </div>
             <div class="form-group">
@@ -114,6 +114,32 @@
                     <input type="text" class="input" name="s_tel" value="<?php echo date('Y-m-d', $nature['publish_time'])?>" readonly/>
                 </div>
             </div>
+			<?php if($this->session->userdata('identity') == 1):?>
+			<div class="form-group">
+                <div class="label">
+                    <label>录入人工号：</label>
+                </div>
+                <div class="field">
+                    <input type="text" class="input" name="s_job_number" value="<?=$owner['job_number']?>" readonly/>
+                </div>
+            </div>
+			<div class="form-group">
+                <div class="label">
+                    <label>录入人姓名：</label>
+                </div>
+                <div class="field">
+                    <input type="text" class="input" name="s_name" value="<?=$owner['name']?>" readonly/>
+                </div>
+            </div>
+			<div class="form-group">
+                <div class="label">
+                    <label>录入人所在单位：</label>
+                </div>
+                <div class="field">
+                    <input type="text" class="input" name="s_academy" value="<?=$owner['academy']?>" readonly/>
+                </div>
+            </div>
+			<?php endif;?>
             <div class="form-group">
                 <div class="label">
                     <label>文章电子版：</label>
